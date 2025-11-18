@@ -1,0 +1,15 @@
+server.port: 9090
+
+spring:
+  sql.init.mode: always
+  output.ansi.enabled: ALWAYS
+
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:6542/statsdb
+    username: dbuser
+    password: 12345
+
+logging.level:
+  ru.practicum: INFO
+  org.springframework.jdbc.datasource.init: DEBUG
