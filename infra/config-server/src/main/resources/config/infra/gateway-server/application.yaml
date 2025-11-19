@@ -1,13 +1,17 @@
+server:
+  port: 8080
 spring:
   cloud:
     gateway:
       discovery:
-        locator.enabled: true
+        locator:
+          enabled: true
       routes:
         - id: main_service_route
           uri: lb://main-service
           predicates:
             - Path=/**
-
-server:
-  port: 8080
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    reactor.netty.http.server: DEBUG
