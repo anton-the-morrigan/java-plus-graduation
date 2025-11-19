@@ -1,5 +1,6 @@
 server:
   port: 8080
+
 spring:
   cloud:
     gateway:
@@ -11,7 +12,3 @@ spring:
           uri: lb://main-service
           predicates:
             - Path=/**
-logging:
-  level:
-    org.springframework.cloud.gateway: DEBUG
-    reactor.netty.http.server: DEBUG
