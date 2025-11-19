@@ -5,7 +5,6 @@ stats:
   server:
     url: http://stats-server:9090
 
-
 spring:
   output.ansi.enabled: ALWAYS # цветной вывод в консоль
   sql.init.mode: always
