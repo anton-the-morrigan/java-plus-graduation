@@ -57,8 +57,7 @@ public class StatsClient {
                     .getFirst();
         } catch (Exception exception) {
             throw new RuntimeException(
-                    "Ошибка обнаружения адреса сервиса статистики с id: " + STATS_SERVER_ID,
-                    exception
+                    String.format("Ошибка обнаружения адреса сервиса статистики с id: %s", STATS_SERVER_ID), exception
             );
         }
     }
