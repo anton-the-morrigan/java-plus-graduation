@@ -15,6 +15,7 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/feign")
 public class FeignParticipationRequestController implements RequestClient  {
 
     private final ParticipationRequestService participationRequestService;

@@ -16,6 +16,7 @@ import java.util.Map;
 @Validated
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/feign")
 public class FeignEventController implements EventClient {
 
     private final EventService eventService;
