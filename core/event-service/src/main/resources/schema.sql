@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS events (
     participant_limit INTEGER NOT NULL,
     lat DOUBLE PRECISION,
     lon DOUBLE PRECISION,
-    FOREIGN KEY (category_id) REFERENCES categories (id),
+    FOREIGN KEY (category_id) REFERENCES categories (id)
 );
 
 CREATE TABLE IF NOT EXISTS event_compilation (
