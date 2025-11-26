@@ -96,8 +96,8 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         }
 
         ParticipationRequest request = new ParticipationRequest();
-        request.setRequester(userId);
-        request.setEvent(eventId);
+        request.setRequesterId(userId);
+        request.setEventId(eventId);
 
         if (requestRepository.existsByEventIdAndRequesterId(eventId, userId)) {
             throw new ConflictException("This request already exists");
@@ -118,7 +118,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         ParticipationRequest request = requestRepository.findById(requestId)
                 .orElseThrow(() -> new NotFoundException("Request not found"));
 
-        if (!request.getRequester().equals(userId)) {
+        if (!request.getRequesterId().equals(userId)) {
             throw new ConflictException("User is not the requester");
         }
 
