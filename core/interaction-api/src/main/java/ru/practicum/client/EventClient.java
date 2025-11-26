@@ -17,7 +17,7 @@ import java.util.Map;
 @FeignClient(name = "event-service")
 public interface EventClient {
 
-    @GetMapping("/users/{userId}/events/{eventId}")
+    @GetMapping("/{eventId}")
     EventFullDto getEventByUserIdAndEventId(@PathVariable @Positive Long userId,
                                             @PathVariable @Positive Long eventId) throws FeignException;
 
