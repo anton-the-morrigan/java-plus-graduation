@@ -2,21 +2,25 @@ server:
   port: 0
 
 spring:
-  output.ansi.enabled: ALWAYS # цветной вывод в консоль
+  output.ansi.enabled: ALWAYS
   sql.init.mode: always
 
   datasource:
     driverClassName: org.postgresql.Driver
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/subscription-service}
-    username: ${SPRING_DATASOURCE_USERNAME:user}
-    password: ${SPRING_DATASOURCE_PASSWORD:password}
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/ewm_subscription
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:password}
+
   jpa:
     show-sql: true
-    "properties.hibernate.format_sql": true
+    properties:
+      hibernate:
+        format_sql: true
     hibernate:
       ddl-auto: none
+
   jackson:
-    "serialization.write-dates-as-timestamps": false
+    serialization.write-dates-as-timestamps: false
 
 logging:
   level:
