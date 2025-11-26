@@ -10,8 +10,8 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
     void deleteByFollowerAndFollowedTo(Long followerUserId, Long followedToUserId);
 
     @Query("""
-            select followedTo.id
-            from Subscribe
-            where follower.id = ?1""")
+            select followedTo
+            from Subscription
+            where follower = ?1""")
     List<Long> findFollowedUsersIds(Long followerUserId);
 }

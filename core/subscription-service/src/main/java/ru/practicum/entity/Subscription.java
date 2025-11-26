@@ -11,7 +11,7 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @Entity
 @NoArgsConstructor
-@Table(name = "subscribes")
+@Table(name = "subscriptions")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Subscription {
 
