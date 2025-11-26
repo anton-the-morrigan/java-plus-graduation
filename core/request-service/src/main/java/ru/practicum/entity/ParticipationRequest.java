@@ -23,14 +23,10 @@ public class ParticipationRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "requester_id", nullable = false)
+    @Column(name = "requester_id", nullable = false)
     Long requester;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "event_id", nullable = false)
+    @Column(name = "event_id", nullable = false)
     Long event;
 
     @Column(name = "status")

@@ -19,12 +19,10 @@ public class Subscription {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "follower_user_id")
+    @Column(name = "follower_user_id")
     Long follower;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "followed_to_user_id")
+    @Column(name = "followed_to_user_id")
     Long followedTo;
 
     public Subscription(Long follower, Long followedTo) {

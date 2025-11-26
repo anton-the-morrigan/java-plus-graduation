@@ -51,8 +51,7 @@ public class Event {
     @JoinColumn(name = "category_id", nullable = false)
     Category category;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "initiator_id", nullable = false)
+    @Column(name = "initiator_id", nullable = false)
     Long initiator;
 
     @Column(name = "paid")
