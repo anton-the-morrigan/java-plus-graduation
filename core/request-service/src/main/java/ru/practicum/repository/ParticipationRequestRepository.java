@@ -23,7 +23,6 @@ public interface ParticipationRequestRepository extends JpaRepository<Participat
 
     long countByEventIdAndStatus(Long eventId, RequestStatus status);
 
-    @EntityGraph(attributePaths = {"requester", "event"})
     List<ParticipationRequest> findAllByRequesterId(Long userId);
 
     default Map<Long, Long> countRequestsByEventIdsAndStatus(List<Long> ids, RequestStatus status) {
@@ -35,7 +34,6 @@ public interface ParticipationRequestRepository extends JpaRepository<Participat
                 ));
     }
 
-    @EntityGraph(attributePaths = {"requester", "event"})
     List<ParticipationRequest> findAllByEventId(Long eventId);
 
     Boolean existsByEventIdAndRequesterId(Long eventId, Long requesterId);
