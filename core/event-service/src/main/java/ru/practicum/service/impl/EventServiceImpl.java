@@ -161,7 +161,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<EventShortDto> getUsersEvents(EventUserSearchParam param) {
         log.info("Get users events: {}", param);
-        Page<Event> events = eventRepository.findByInitiatorId(param.getUserId(), param.getPageable());
+        Page<Event> events = eventRepository.findByInitiator(param.getUserId(), param.getPageable());
 
         List<Long> eventIds = events.stream().map(Event::getId).toList();
         Map<Long, Long> views = getViews(eventIds);
