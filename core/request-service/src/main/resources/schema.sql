@@ -3,7 +3,5 @@ CREATE TABLE IF NOT EXISTS participation_requests (
     requester_id BIGINT NOT NULL,
     event_id BIGINT NOT NULL,
     status VARCHAR NOT NULL,
-    created TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    FOREIGN KEY (requester_id) REFERENCES users (id),
-    FOREIGN KEY (event_id) REFERENCES events (id)
+    created TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
