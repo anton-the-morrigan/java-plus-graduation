@@ -24,10 +24,10 @@ public class ParticipationRequest {
     Long id;
 
     @Column(name = "requester_id", nullable = false)
-    Long requester;
+    Long requesterId;
 
     @Column(name = "event_id", nullable = false)
-    Long event;
+    Long eventId;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)

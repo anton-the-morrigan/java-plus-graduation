@@ -7,7 +7,7 @@ import ru.practicum.entity.Subscription;
 import java.util.List;
 
 public interface SubscriptionRepository extends JpaRepository<Subscription, Long> {
-    void deleteByFollower_IdIsAndFollowedTo_Id(Long followerUserId, Long followedToUserId);
+    void deleteByFollowerAndFollowedTo(Long followerUserId, Long followedToUserId);
 
     @Query("""
             select followedTo.id

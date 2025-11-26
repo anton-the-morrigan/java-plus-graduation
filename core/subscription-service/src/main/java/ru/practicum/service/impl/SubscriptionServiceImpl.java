@@ -51,7 +51,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Transactional
     public void deleteSubscribe(long followerUserId, long followedToUserId) {
         log.debug("Запрос на удаление подписки пользователя id = {} на пользователя id = {}", followerUserId, followedToUserId);
-        subscriptionRepository.deleteByFollower_IdIsAndFollowedTo_Id(followerUserId, followedToUserId);
+        subscriptionRepository.deleteByFollowerAndFollowedTo(followerUserId, followedToUserId);
         log.info("Удалена подписка пользователя id = {} на пользователя id = {}", followerUserId, followedToUserId);
     }
 
