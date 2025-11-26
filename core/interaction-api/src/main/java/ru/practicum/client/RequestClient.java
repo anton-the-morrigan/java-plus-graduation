@@ -14,10 +14,10 @@ import java.util.Map;
 @FeignClient(name = "request-service")
 public interface RequestClient {
 
-    @GetMapping("/events/event/{eventId}")
+    @GetMapping("/users/{userId}/events/{eventId}/requests")
     List<ParticipationRequestDto> getRequestForEventByUserId(@PathVariable @Positive Long eventId, @PathVariable @Positive Long userId) throws FeignException;
 
-    @PatchMapping("/events/{eventId}/requests")
+    @PatchMapping("/users/{userId}/events/{eventId}/requests")
     EventRequestStatusUpdateResult updateRequests(@PathVariable @Positive Long eventId, @PathVariable @Positive Long userId, @RequestBody EventRequestStatusUpdateRequest updateRequest) throws FeignException;
 
     @GetMapping("/confirmed")

@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.client.EventClient;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventShortDto;
 import ru.practicum.dto.NewEventDto;
@@ -16,17 +15,15 @@ import ru.practicum.dto.request.EventRequestStatusUpdateRequest;
 import ru.practicum.dto.request.EventRequestStatusUpdateResult;
 import ru.practicum.dto.request.ParticipationRequestDto;
 import ru.practicum.params.EventUserSearchParam;
-import ru.practicum.params.PublicEventSearchParam;
 import ru.practicum.service.EventService;
 
 import java.util.List;
-import java.util.Map;
 
 @Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users/{userId}/events")
-public class PrivateEventController implements EventClient {
+public class PrivateEventController {
 
     private final EventService eventService;
     private final String id = "/{eventId}";
@@ -55,13 +52,6 @@ public class PrivateEventController implements EventClient {
         return eventService.saveEvent(dto, userId);
     }
 
-    @Override
-    public EventFullDto getEventByUserIdAndEventId(Long userId,
-                                                   Long eventId) {
-
-        return eventService.getEventByIdAndUserId(eventId, userId);
-    }
-
     @PatchMapping(id)
     public EventFullDto updateEventByUser(@PathVariable @Positive Long userId,
                                           @PathVariable @Positive Long eventId,
@@ -83,16 +73,6 @@ public class PrivateEventController implements EventClient {
                                                               @RequestBody EventRequestStatusUpdateRequest updateRequest) {
 
         return eventService.updateRequests(eventId, userId, updateRequest);
-    }
-
-    @Override
-    public List<EventShortDto> getEventsFeedCogList(List<Long> followedUsersIds, PublicEventSearchParam param) {
-        return eventService.getEventsFeedCogList(followedUsersIds, param);
-    }
-
-    @Override
-    public Map<Long, EventFullDto> getEventsFeedCogMap(List<Long> followedUsersIds, PublicEventSearchParam param) {
-        return eventService.getEventsFeedCogMap(followedUsersIds, param);
     }
 }
 
