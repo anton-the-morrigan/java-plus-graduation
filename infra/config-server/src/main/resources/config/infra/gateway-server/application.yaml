@@ -7,8 +7,23 @@ spring:
       discovery:
         locator:
           enabled: true
-      routes:
-        - id: main_service_route
-          uri: lb://main-service
-          predicates:
-            - Path=/**
+          routes:
+            - id: user-service-route
+              uri: lb://user-service
+              predicates:
+                - Path=/user-service/**
+
+            - id: subscription-service-route
+              uri: lb://subscription-service
+              predicates:
+                - Path=/subscription-service/**
+
+            - id: request-service-route
+              uri: lb://request-service
+              predicates:
+                - Path=/request-service/**
+
+            - id: event-service-route
+              uri: lb://event-service
+              predicates:
+                - Path=/event-service/**
