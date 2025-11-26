@@ -26,8 +26,7 @@ CREATE TABLE IF NOT EXISTS events (
     lat DOUBLE PRECISION,
     lon DOUBLE PRECISION,
     FOREIGN KEY (category_id) REFERENCES categories (id),
-    FOREIGN KEY (initiator_id) REFERENCES users (id)
-    );
+);
 
 CREATE TABLE IF NOT EXISTS event_compilation (
     compilation_id BIGINT NOT NULL REFERENCES compilations (id),
