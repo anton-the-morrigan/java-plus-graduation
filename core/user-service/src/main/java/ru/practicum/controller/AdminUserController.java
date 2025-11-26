@@ -3,6 +3,7 @@ package ru.practicum.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.client.UserClient;
 import ru.practicum.dto.NewUserRequest;
 import ru.practicum.dto.user.UserDto;
 import ru.practicum.service.UserService;
@@ -12,7 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin/users")
 @RequiredArgsConstructor
-public class AdminUserController {
+public class AdminUserController implements UserClient {
     private final UserService userService;
 
     @PostMapping
@@ -27,7 +28,7 @@ public class AdminUserController {
         userService.deleteUser(userId);
     }
 
-    @GetMapping()
+    @Override
     public List<UserDto> getUsers(@RequestParam(value = "ids", required = false) List<Long> ids,
                                   @RequestParam(defaultValue = "0") Integer from,
                                   @RequestParam(defaultValue = "10") Integer size) {

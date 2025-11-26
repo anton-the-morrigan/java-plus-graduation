@@ -53,7 +53,7 @@ public class Event {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "initiator_id", nullable = false)
-    User initiator;
+    Long initiator;
 
     @Column(name = "paid")
     Boolean paid;

@@ -18,7 +18,7 @@ public class EventFullDto {
     Long confirmedRequests;
     LocalDateTime eventDate;
     Long id;
-    UserShortDto initiator;
+    Long initiator;
     Boolean paid;
     String title;
     Long views;

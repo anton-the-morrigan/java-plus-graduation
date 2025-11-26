@@ -11,7 +11,7 @@ import ru.practicum.entity.Event;
 import java.util.Collection;
 import java.util.List;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = {CategoryMapperStruct.class, UserMapperStruct.class, LocationMapper.class})
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = {CategoryMapperStruct.class, LocationMapper.class})
 public interface EventMapper {
 
     @Mapping(target = "views", ignore = true)

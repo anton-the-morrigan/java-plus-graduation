@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.client.EventClient;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventShortDto;
 import ru.practicum.dto.NewEventDto;
@@ -15,19 +16,19 @@ import ru.practicum.dto.request.EventRequestStatusUpdateRequest;
 import ru.practicum.dto.request.EventRequestStatusUpdateResult;
 import ru.practicum.dto.request.ParticipationRequestDto;
 import ru.practicum.params.EventUserSearchParam;
+import ru.practicum.params.PublicEventSearchParam;
 import ru.practicum.service.EventService;
-import ru.practicum.service.ParticipationRequestService;
 
 import java.util.List;
+import java.util.Map;
 
 @Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users/{userId}/events")
-public class PrivateEventController {
+public class PrivateEventController implements EventClient {
 
     private final EventService eventService;
-    private final ParticipationRequestService requestService;
     private final String id = "/{eventId}";
     private final String requests = "/{eventId}/requests";
 
@@ -54,9 +55,9 @@ public class PrivateEventController {
         return eventService.saveEvent(dto, userId);
     }
 
-    @GetMapping(id)
-    public EventFullDto getEventByUserIdAndEventId(@PathVariable @Positive Long userId,
-                                                   @PathVariable @Positive Long eventId) {
+    @Override
+    public EventFullDto getEventByUserIdAndEventId(Long userId,
+                                                   Long eventId) {
 
         return eventService.getEventByIdAndUserId(eventId, userId);
     }
@@ -73,8 +74,7 @@ public class PrivateEventController {
     public List<ParticipationRequestDto> getUsersRequests(@PathVariable @Positive Long userId,
                                                           @PathVariable @Positive Long eventId) {
 
-        List<ParticipationRequestDto> requestForEventByUserId = requestService.getRequestForEventByUserId(eventId, userId);
-        return requestForEventByUserId;
+        return eventService.getRequestForEventByUserId(eventId, userId);
     }
 
     @PatchMapping(requests)
@@ -82,7 +82,17 @@ public class PrivateEventController {
                                                               @PathVariable @Positive Long eventId,
                                                               @RequestBody EventRequestStatusUpdateRequest updateRequest) {
 
-        return requestService.updateRequests(eventId, userId, updateRequest);
+        return eventService.updateRequests(eventId, userId, updateRequest);
+    }
+
+    @Override
+    public List<EventShortDto> getEventsFeedCogList(List<Long> followedUsersIds, PublicEventSearchParam param) {
+        return eventService.getEventsFeedCogList(followedUsersIds, param);
+    }
+
+    @Override
+    public Map<Long, EventFullDto> getEventsFeedCogMap(List<Long> followedUsersIds, PublicEventSearchParam param) {
+        return eventService.getEventsFeedCogMap(followedUsersIds, param);
     }
 }
 

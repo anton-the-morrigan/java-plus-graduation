@@ -21,13 +21,13 @@ public class Subscription {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "follower_user_id")
-    User follower;
+    Long follower;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "followed_to_user_id")
-    User followedTo;
+    Long followedTo;
 
-    public Subscription(User follower, User followedTo) {
+    public Subscription(Long follower, Long followedTo) {
         this.follower = follower;
         this.followedTo = followedTo;
     }

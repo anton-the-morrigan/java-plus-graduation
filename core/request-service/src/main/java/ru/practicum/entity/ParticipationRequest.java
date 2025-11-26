@@ -26,12 +26,12 @@ public class ParticipationRequest {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "requester_id", nullable = false)
-    User requester;
+    Long requester;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "event_id", nullable = false)
-    Event event;
+    Long event;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)

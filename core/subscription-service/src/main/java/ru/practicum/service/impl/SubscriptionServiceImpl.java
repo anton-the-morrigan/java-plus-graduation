@@ -2,48 +2,37 @@ package ru.practicum.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.StatsClient;
+import ru.practicum.client.EventClient;
+import ru.practicum.client.RequestClient;
+import ru.practicum.client.UserClient;
+import ru.practicum.dto.event.EventFullDto;
+import ru.practicum.dto.user.UserDto;
 import ru.practicum.repository.SubscriptionRepository;
 import ru.practicum.dto.ViewStatsDto;
 import ru.practicum.dto.event.EventShortDto;
 import ru.practicum.dto.user.UserShortDto;
-import ru.practicum.entity.Event;
-import ru.practicum.entity.RequestStatus;
 import ru.practicum.entity.Subscription;
-import ru.practicum.entity.User;
-import ru.practicum.exception.NotFoundException;
-import ru.practicum.mapper.EventMapper;
-import ru.practicum.mapper.UserMapperStruct;
 import ru.practicum.params.PublicEventSearchParam;
 import ru.practicum.params.SortSearchParam;
-import ru.practicum.repository.EventRepository;
-import ru.practicum.repository.ParticipationRequestRepository;
-import ru.practicum.repository.UserRepository;
 import ru.practicum.service.SubscriptionService;
 
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static ru.practicum.specifications.EventSpecifications.eventFeedSearchParamSpec;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class SubscriptionServiceImpl implements SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
-    private final UserRepository userRepository;
-    private final EventRepository eventRepository;
-    private final ParticipationRequestRepository requestRepository;
-    private final UserMapperStruct userMapper;
-    private final EventMapper eventMapper;
+    private final UserClient userClient;
+    private final EventClient eventClient;
+    private final RequestClient requestClient;
     private final StatsClient statsClient;
 
     private final String startDate = "2000-01-01 00:00:00";
@@ -53,9 +42,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Transactional
     public void createSubscribe(long followerUserId, long followedToUserId) {
         log.debug("Запрос на создание подписки пользователя id = {} на пользователя id = {}", followerUserId, followedToUserId);
-        User follower = getUserOrElseThrow(followerUserId);
-        User followedTo = getUserOrElseThrow(followedToUserId);
-        Subscription subscription = new Subscription(follower, followedTo);
+        Subscription subscription = new Subscription(followerUserId, followedToUserId);
         subscriptionRepository.save(subscription);
         log.info("Создана подписка пользователя id = {} на пользователя id = {}", followerUserId, followedToUserId);
     }
@@ -72,18 +59,19 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     public List<UserShortDto> getSubscribes(long userId, int from, int size) {
         log.debug("Запрос на получение подписок пользователя id = {}", userId);
         List<Long> followedUsersIds = subscriptionRepository.findFollowedUsersIds(userId);
-        List<User> users = userRepository.findAllByIdIn(followedUsersIds, PageRequest.of(from / size, size));
-        return users.stream().map(userMapper::toShortDto).toList();
+        List<UserDto> users = userClient.getUsers(followedUsersIds, from, size);
+        return users.stream().map(user -> new UserShortDto(user.getId(), user.getName())).toList();
     }
 
     @Override
     public List<EventShortDto> getEventsFeed(long userId, PublicEventSearchParam param) {
         log.debug("Запрос на получение ленты событий пользователя id = {}, params: {}", userId, param);
         List<Long> followedUsersIds = subscriptionRepository.findFollowedUsersIds(userId);
-        Page<Event> eventsPage = eventRepository.findAll(EventSpecifications.eventFeedSearchParamSpec(followedUsersIds, param), param.getPageable());
-        Map<Long, Event> eventsMap = eventsPage.stream().collect(Collectors.toMap(Event::getId, Function.identity()));
 
-        List<EventShortDto> events = eventMapper.toShortDto(eventsPage.toList());
+        List<EventShortDto> events = eventClient.getEventsFeedCogList(followedUsersIds, param);
+
+        Map<Long, EventFullDto> eventsMap = eventClient.getEventsFeedCogMap(followedUsersIds, param);
+
         connectViews(events);
         connectConfirmedRequests(events);
         if (param.getOnlyAvailable()) {
@@ -120,16 +108,10 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     private void connectConfirmedRequests(Collection<EventShortDto> events) {
-        Map<Long, Long> confirmed = requestRepository.countRequestsByEventIdsAndStatus(
-                events.stream().map(EventShortDto::getId).toList(),
-                RequestStatus.CONFIRMED);
+        Map<Long, Long> confirmed = requestClient.getConfirmedRequestsCount(
+                events.stream().map(EventShortDto::getId).toList());
 
         events.forEach(event ->
                 event.setConfirmedRequests(confirmed.getOrDefault(event.getId(), 0L)));
-    }
-
-    private User getUserOrElseThrow(long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Пользователь id = " + userId + " не существует"));
     }
 }
