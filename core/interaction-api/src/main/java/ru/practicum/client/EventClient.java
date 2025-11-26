@@ -6,6 +6,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventShortDto;
 import ru.practicum.params.PublicEventSearchParam;
@@ -21,8 +22,8 @@ public interface EventClient {
                                             @PathVariable @Positive Long eventId) throws FeignException;
 
     @PatchMapping("/feed/1")
-    List<EventShortDto> getEventsFeedCogList(List<Long> followedUsersIds, PublicEventSearchParam param) throws FeignException;
+    List<EventShortDto> getEventsFeedCogList(@RequestParam List<Long> followedUsersIds, @RequestParam PublicEventSearchParam param) throws FeignException;
 
     @PatchMapping("/feed/2")
-    Map<Long, EventFullDto> getEventsFeedCogMap(List<Long> followedUsersIds, PublicEventSearchParam param) throws FeignException;
+    Map<Long, EventFullDto> getEventsFeedCogMap(@RequestParam List<Long> followedUsersIds, @RequestParam PublicEventSearchParam param) throws FeignException;
 }
