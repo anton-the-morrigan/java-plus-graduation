@@ -27,7 +27,6 @@ public class PrivateEventController {
 
     private final EventService eventService;
     private final String id = "/{eventId}";
-    private final String requests = "/{eventId}/requests";
 
 
     @GetMapping
@@ -58,21 +57,6 @@ public class PrivateEventController {
                                           @RequestBody @Valid UpdateEventUserRequest event) {
 
         return eventService.updateEventByUser(eventId, userId, event);
-    }
-
-    @GetMapping(requests)
-    public List<ParticipationRequestDto> getUsersRequests(@PathVariable @Positive Long userId,
-                                                          @PathVariable @Positive Long eventId) {
-
-        return eventService.getRequestForEventByUserId(eventId, userId);
-    }
-
-    @PatchMapping(requests)
-    public EventRequestStatusUpdateResult updateUsersRequests(@PathVariable @Positive Long userId,
-                                                              @PathVariable @Positive Long eventId,
-                                                              @RequestBody EventRequestStatusUpdateRequest updateRequest) {
-
-        return eventService.updateRequests(eventId, userId, updateRequest);
     }
 }
 

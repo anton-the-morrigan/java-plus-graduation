@@ -35,7 +35,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
     @Override
     public List<ParticipationRequestDto> getRequestForEventByUserId(Long eventId, Long userId) {
         log.info("Get request for event by id: {}", eventId);
-        EventFullDto event = eventClient.getEventByUserIdAndEventId(userId, eventId);
+        EventFullDto event = eventClient.getEventForParticipationService(eventId);
         if (!Objects.equals(event.getInitiator(), userId)) {
             throw new ConflictException("Can't get request for event id=" + eventId + "by user id=" + userId);
         }
@@ -52,7 +52,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
                                                          EventRequestStatusUpdateRequest updateRequest) {
         log.info("Update request: {}", updateRequest);
         List<ParticipationRequest> requestList = requestRepository.findAllById(updateRequest.getRequestIds());
-        EventFullDto event = eventClient.getEventByUserIdAndEventId(userId, eventId);
+        EventFullDto event = eventClient.getEventForParticipationService(eventId);
         if (!Objects.equals(event.getInitiator(), userId)) {
             throw new ConflictException("Can't update event id=" + eventId + " requests by user id=" + userId);
         }
@@ -68,6 +68,9 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
             }
         });
         return result;
+
+
+
     }
 
     @Override
@@ -80,7 +83,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
 
     @Override
     public ParticipationRequestDto createRequest(Long userId, Long eventId) {
-        EventFullDto event = eventClient.getEventByUserIdAndEventId(userId, eventId);
+        EventFullDto event = eventClient.getEventForParticipationService(eventId);
 
         if (event.getInitiator().equals(userId)) {
             throw new ConflictException("Initiator cannot request participation in their own event");

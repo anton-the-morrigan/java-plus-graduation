@@ -26,7 +26,9 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByEmail(newUserRequest.getEmail())) {
             throw new ConflictException("Указанный адрес электронной почты уже зарегестрирован");
         }
-        User user = userRepository.save(userMapper.toUser(newUserRequest));
+        User user = userMapper.toUser(newUserRequest);
+        userValidator(user);
+        userRepository.save(user);
         return userMapper.toUserDto(user);
     }
 

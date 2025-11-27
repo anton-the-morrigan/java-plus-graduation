@@ -2,10 +2,7 @@ package ru.practicum.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.practicum.client.EventClient;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventShortDto;
@@ -18,16 +15,13 @@ import java.util.Map;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/feign")
 public class FeignEventController implements EventClient {
 
     private final EventService eventService;
 
-    @GetMapping("/users/{userId}/events/{eventId}")
-    public EventFullDto getEventByUserIdAndEventId(Long userId,
-                                                   Long eventId) {
-
-        return eventService.getEventByIdAndUserId(eventId, userId);
+    @GetMapping("/pr/events/{eventId}")
+    public EventFullDto getEventForParticipationService(Long eventId) {
+        return eventService.getEventById(eventId);
     }
 
     @PatchMapping("/feed/1")

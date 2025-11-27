@@ -18,7 +18,7 @@ public class EventSpecifications {
             if (userIds == null || userIds.isEmpty()) {
                 return criteriaBuilder.conjunction();
             }
-            Path<Long> initiatorIdPath = root.get("initiator").get("id");
+            Path<Long> initiatorIdPath = root.get("initiator");
             return initiatorIdPath.in(userIds);
         };
     }

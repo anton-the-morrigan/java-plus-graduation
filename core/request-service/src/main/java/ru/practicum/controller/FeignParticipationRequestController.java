@@ -15,20 +15,9 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/feign")
 public class FeignParticipationRequestController implements RequestClient  {
 
     private final ParticipationRequestService participationRequestService;
-
-    @GetMapping("/users/{userId}/events/{eventId}/requests")
-    public List<ParticipationRequestDto> getRequestForEventByUserId(Long eventId, Long userId) {
-        return participationRequestService.getRequestForEventByUserId(eventId, userId);
-    }
-
-    @PatchMapping("/users/{userId}/events/{eventId}/requests")
-    public EventRequestStatusUpdateResult updateRequests(Long eventId, Long userId, EventRequestStatusUpdateRequest updateRequest) {
-        return participationRequestService.updateRequests(eventId, userId, updateRequest);
-    }
 
     @GetMapping("/confirmed")
     public Map<Long, Long> getConfirmedRequestsCount(List<Long> eventIds) {
