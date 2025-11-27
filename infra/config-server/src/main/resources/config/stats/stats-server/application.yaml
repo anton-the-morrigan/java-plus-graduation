@@ -1,4 +1,4 @@
-server.port: 0
+server.port: ${SERVER_PORT:0}
 
 spring:
   sql.init.mode: always
@@ -10,6 +10,9 @@ spring:
     username: ${POSTGRES_USER:postgres}
     password: ${POSTGRES_PASSWORD:password}
 
-logging.level:
-  ru.practicum: INFO
-  org.springframework.jdbc.datasource.init: DEBUG
+logging:
+  file:
+    name: logs/${spring.application.name}.log
+  level:
+    ru.practicum: INFO
+    org.springframework.jdbc.datasource.init: DEBUG
