@@ -20,17 +20,17 @@ public class FeignParticipationRequestController implements RequestClient  {
 
     private final ParticipationRequestService participationRequestService;
 
-    @Override
+    @GetMapping("/users/{userId}/events/{eventId}/requests")
     public List<ParticipationRequestDto> getRequestForEventByUserId(Long eventId, Long userId) {
         return participationRequestService.getRequestForEventByUserId(eventId, userId);
     }
 
-    @Override
+    @PatchMapping("/users/{userId}/events/{eventId}/requests")
     public EventRequestStatusUpdateResult updateRequests(Long eventId, Long userId, EventRequestStatusUpdateRequest updateRequest) {
         return participationRequestService.updateRequests(eventId, userId, updateRequest);
     }
 
-    @Override
+    @GetMapping("/confirmed")
     public Map<Long, Long> getConfirmedRequestsCount(List<Long> eventIds) {
         return participationRequestService.getConfirmedRequestsCount(eventIds);
     }

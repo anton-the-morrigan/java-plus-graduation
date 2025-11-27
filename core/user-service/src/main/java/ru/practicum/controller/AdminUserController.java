@@ -28,7 +28,7 @@ public class AdminUserController implements UserClient {
         userService.deleteUser(userId);
     }
 
-    @Override
+    @GetMapping()
     public List<UserDto> getUsers(@RequestParam(value = "ids", required = false) List<Long> ids,
                                   @RequestParam(defaultValue = "0") Integer from,
                                   @RequestParam(defaultValue = "10") Integer size) {

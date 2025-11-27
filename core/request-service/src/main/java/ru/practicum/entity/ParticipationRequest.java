@@ -34,6 +34,5 @@ public class ParticipationRequest {
     RequestStatus status;
 
     @Column(name = "created")
-    @CreationTimestamp
-    LocalDateTime created;
+    LocalDateTime created = LocalDateTime.now();
 }

@@ -26,10 +26,10 @@ public class Event {
     @Column(name = "title")
     String title;
 
-    @Column(name = "annotation")
+    @Column(name = "annotation", length = 2000)
     String annotation;
 
-    @Column(name = "description")
+    @Column(name = "description", length = 10000)
     String description;
 
     @Column(name = "state")
