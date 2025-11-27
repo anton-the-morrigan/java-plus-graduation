@@ -2,28 +2,28 @@ server:
   port: 8080
 
 spring:
+  output.ansi.enabled: ALWAYS
   cloud:
     gateway:
-      discovery:
-        locator:
-          enabled: true
+      server:
+        webflux:
           routes:
             - id: user-service-route
               uri: lb://user-service
               predicates:
-                - Path=/user-service/**
+                - Path=/admin/users/**
 
             - id: subscription-service-route
               uri: lb://subscription-service
               predicates:
-                - Path=/subscription-service/**
+                - Path=/users/{userId}/subscriptions/**,/users/{userId}/events/feed
 
             - id: request-service-route
               uri: lb://request-service
               predicates:
-                - Path=/request-service/**
+                - Path=/users/{userId}/requests/**
 
             - id: event-service-route
               uri: lb://event-service
               predicates:
-                - Path=/event-service/**
+                - Path=/**
