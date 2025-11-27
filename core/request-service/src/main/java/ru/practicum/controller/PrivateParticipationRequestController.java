@@ -1,5 +1,6 @@
 package ru.practicum.controller;
 
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -39,15 +40,16 @@ public class PrivateParticipationRequestController {
     }
 
     @GetMapping("/events/{eventId}/requests")
-    public List<ParticipationRequestDto> getUsersRequests(@PathVariable Long userId,
-                                                          @PathVariable Long eventId) {
+    public List<ParticipationRequestDto> getUsersRequests(@PathVariable @Positive Long userId,
+                                                          @PathVariable @Positive Long eventId) {
 
-        return participationRequestService.getRequestForEventByUserId(eventId, userId);
+        List<ParticipationRequestDto> requestForEventByUserId = participationRequestService.getRequestForEventByUserId(eventId, userId);
+        return requestForEventByUserId;
     }
 
     @PatchMapping("/events/{eventId}/requests")
-    public EventRequestStatusUpdateResult updateUsersRequests(@PathVariable Long userId,
-                                                              @PathVariable Long eventId,
+    public EventRequestStatusUpdateResult updateUsersRequests(@PathVariable @Positive Long userId,
+                                                              @PathVariable @Positive Long eventId,
                                                               @RequestBody EventRequestStatusUpdateRequest updateRequest) {
 
         return participationRequestService.updateRequests(eventId, userId, updateRequest);

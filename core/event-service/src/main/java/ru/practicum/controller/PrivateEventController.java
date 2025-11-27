@@ -51,6 +51,13 @@ public class PrivateEventController {
         return eventService.saveEvent(dto, userId);
     }
 
+    @GetMapping(id)
+    public EventFullDto getEventByUserIdAndEventId(@PathVariable @Positive Long userId,
+                                                   @PathVariable @Positive Long eventId) {
+
+        return eventService.getEventByIdAndUserId(eventId, userId);
+    }
+
     @PatchMapping(id)
     public EventFullDto updateEventByUser(@PathVariable @Positive Long userId,
                                           @PathVariable @Positive Long eventId,

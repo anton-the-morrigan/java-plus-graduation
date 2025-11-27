@@ -202,25 +202,25 @@ public class EventServiceImpl implements EventService {
         return dtoResponse;
     }
 
-//    @Override
-//    public EventFullDto getEventByIdAndUserId(Long eventId, Long userId) {
-//        log.info("Get event: {}", eventId);
-//
-//        Event event = eventRepository.findById(eventId)
-//                .orElseThrow(() -> new NotFoundException("Событие не найдено"));
-//
-//        if (!Objects.equals(event.getInitiator(), userId)) {
-//            throw new ConflictException("Событие добавленно не теущем пользователем");
-//        }
-//
-//        Map<Long, Long> confirmed = requestClient.getConfirmedRequestsCount(List.of(event.getId()));
-//        Map<Long, Long> views = getViews(List.of(event.getId()));
-//
-//        EventFullDto dto = eventMapper.toFullDto(event);
-//        dto.setConfirmedRequests(confirmed.get(dto.getId()));
-//        dto.setViews(views.get(dto.getId()));
-//        return dto;
-//    }
+    @Override
+    public EventFullDto getEventByIdAndUserId(Long eventId, Long userId) {
+        log.info("Get event: {}", eventId);
+
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Событие не найдено"));
+
+        if (!Objects.equals(event.getInitiator(), userId)) {
+            throw new ConflictException("Событие добавленно не теущем пользователем");
+        }
+
+        Map<Long, Long> confirmed = requestClient.getConfirmedRequestsCount(List.of(event.getId()));
+        Map<Long, Long> views = getViews(List.of(event.getId()));
+
+        EventFullDto dto = eventMapper.toFullDto(event);
+        dto.setConfirmedRequests(confirmed.get(dto.getId()));
+        dto.setViews(views.get(dto.getId()));
+        return dto;
+    }
 
     @Override
     public EventFullDto updateEventByUser(Long eventId, Long userId, UpdateEventUserRequest event) {

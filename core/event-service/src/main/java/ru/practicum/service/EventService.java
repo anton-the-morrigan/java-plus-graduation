@@ -30,6 +30,8 @@ public interface EventService {
 
     EventFullDto saveEvent(NewEventDto dto, Long userId);
 
+    EventFullDto getEventByIdAndUserId(Long userId, Long eventId);
+
     EventFullDto updateEventByUser(Long userId, Long eventId, UpdateEventUserRequest updateRequest);
 
     List<EventShortDto> getEventsFeedCogList(List<Long> followedUsersIds, PublicEventSearchParam param);

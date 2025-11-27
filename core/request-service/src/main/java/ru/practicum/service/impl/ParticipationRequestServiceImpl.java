@@ -68,9 +68,6 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
             }
         });
         return result;
-
-
-
     }
 
     @Override
