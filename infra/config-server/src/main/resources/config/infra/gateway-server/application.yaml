@@ -21,12 +21,12 @@ spring:
             - id: subscription-service-route
               uri: lb://subscription-service
               predicates:
-                - Path=/users/{userId}/subscriptions/**,/users/{userId}/events/feed
+                - Path=/users/*/subscriptions/**, /users/*/events/feed
 
             - id: request-service-route
               uri: lb://request-service
               predicates:
-                - Path=/users/{userId}/requests/**
+                - Path=/users/*/requests/**, /users/*/events/*/requests/**
 
             - id: event-service-route
               uri: lb://event-service
