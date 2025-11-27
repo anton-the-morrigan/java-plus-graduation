@@ -1,5 +1,10 @@
-server:
-  port: 8080
+server.port: 8080
+
+logging:
+  file:
+    name: logs/${spring.application.name}.log
+  level:
+    org.springframework.cloud.gateway: TRACE
 
 spring:
   output.ansi.enabled: ALWAYS
