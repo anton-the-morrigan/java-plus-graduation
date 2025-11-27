@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Import;
 import ru.practicum.config.ExceptionHandlingConfig;
 import ru.practicum.config.JacksonConfig;
 
-@EnableFeignClients
+@EnableFeignClients("ru.practicum.client")
 @SpringBootApplication
 @Import({JacksonConfig.class, ExceptionHandlingConfig.class})
 public class UserService {
