@@ -1,6 +1,7 @@
 server.port: ${SERVER_PORT:0}
 
 spring:
+  output.ansi.enabled: ALWAYS
   application:
     name: config-server
   profiles:

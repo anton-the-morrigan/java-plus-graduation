@@ -23,7 +23,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto addUser(NewUserRequest newUserRequest) {
-        if (userRepository.existsByEmail(newUserRequest.getEmail())) {
+        if (newUserRequest.getName() == null) {
+            throw new BadRequestException("Имя не может быть пустым");
+        }
+        if (newUserRequest.getEmail() == null) {
+            throw new BadRequestException("Адрес электронной почты не может быть пустым");
+        } else if (userRepository.existsByEmail(newUserRequest.getEmail())) {
             throw new ConflictException("Указанный адрес электронной почты уже зарегестрирован");
         }
         User user = userMapper.toUser(newUserRequest);
