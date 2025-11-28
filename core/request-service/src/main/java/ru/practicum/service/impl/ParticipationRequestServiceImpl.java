@@ -86,7 +86,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
             throw new ConflictException("Initiator cannot request participation in their own event");
         }
 
-        if (!event.getState().equals(EventState.PUBLISHED)) {
+        if (!EventState.PUBLISHED.equals(event.getState())) {
             throw new ConflictException("Event must be published to request participation");
         }
 
@@ -95,22 +95,24 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
             throw new ConflictException("Event participant limit reached");
         }
 
-        ParticipationRequest request = new ParticipationRequest();
-        request.setRequesterId(userId);
-        request.setEventId(eventId);
-
         if (requestRepository.existsByEventIdAndRequesterId(eventId, userId)) {
             throw new ConflictException("This request already exists");
         }
+
+        ParticipationRequest request = new ParticipationRequest();
+        request.setRequesterId(userId);
+        request.setEventId(eventId);
+        request.setCreated(LocalDateTime.now());
 
         if (event.getParticipantLimit() == 0) {
             request.setStatus(RequestStatus.CONFIRMED);
         } else {
             request.setStatus(event.getRequestModeration() ? RequestStatus.PENDING : RequestStatus.CONFIRMED);
         }
-        request.setCreated(LocalDateTime.now());
 
-        return participationRequestMapper.toDto(requestRepository.save(request));
+        ParticipationRequestDto dto = participationRequestMapper.toDto(requestRepository.save(request));
+        log.info("Participation request created {}", dto);
+        return dto;
     }
 
     @Override

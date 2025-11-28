@@ -21,7 +21,7 @@ public class FeignEventController implements EventClient {
 
     @GetMapping("/pr/events/{eventId}")
     public EventFullDto getEventForParticipationService(Long eventId) {
-        return eventService.getEventById(eventId);
+        return eventService.getEventForRequest(eventId);
     }
 
     @PatchMapping("/feed/1")

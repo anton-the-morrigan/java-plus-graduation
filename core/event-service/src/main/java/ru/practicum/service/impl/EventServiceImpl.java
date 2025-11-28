@@ -10,6 +10,9 @@ import ru.practicum.client.RequestClient;
 import ru.practicum.dto.NewEventDto;
 import ru.practicum.dto.ViewStatsDto;
 import ru.practicum.dto.event.*;
+import ru.practicum.dto.request.EventRequestStatusUpdateRequest;
+import ru.practicum.dto.request.EventRequestStatusUpdateResult;
+import ru.practicum.dto.request.ParticipationRequestDto;
 import ru.practicum.entity.*;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
@@ -112,7 +115,21 @@ public class EventServiceImpl implements EventService {
         log.info("Get event: {}", id);
 
         Event event = eventRepository.findByIdAndState(id, EventState.PUBLISHED)
-                .orElseThrow(() -> new ConflictException("Событие не найдено или не опубликовано"));
+                .orElseThrow(() -> new NotFoundException("Событие не найдено или не опубликовано"));
+        Map<Long, Long> confirmed = requestClient.getConfirmedRequestsCount(List.of(event.getId()));
+        Map<Long, Long> views = getViews(List.of(event.getId()));
+
+        EventFullDto dto = eventMapper.toFullDto(event);
+        dto.setConfirmedRequests(confirmed.get(dto.getId()));
+        dto.setViews(views.get(dto.getId()));
+        return dto;
+    }
+
+    @Override
+    public EventFullDto getEventForRequest(Long id) {
+        log.info("Get event: {}", id);
+
+        Event event = eventRepository.findById(id).get();
         Map<Long, Long> confirmed = requestClient.getConfirmedRequestsCount(List.of(event.getId()));
         Map<Long, Long> views = getViews(List.of(event.getId()));
 
