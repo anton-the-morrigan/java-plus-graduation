@@ -1,14 +1,34 @@
-server:
-  port: 8080
+server.port: 8080
+
+logging:
+  file:
+    name: logs/${spring.application.name}.log
+  level:
+    org.springframework.cloud.gateway: TRACE
 
 spring:
+  output.ansi.enabled: ALWAYS
   cloud:
     gateway:
-      discovery:
-        locator:
-          enabled: true
-      routes:
-        - id: main_service_route
-          uri: lb://main-service
-          predicates:
-            - Path=/**
+      server:
+        webflux:
+          routes:
+            - id: user-service-route
+              uri: lb://user-service
+              predicates:
+                - Path=/admin/users/**
+
+            - id: subscription-service-route
+              uri: lb://subscription-service
+              predicates:
+                - Path=/users/*/subscriptions/**, /users/*/events/feed
+
+            - id: request-service-route
+              uri: lb://request-service
+              predicates:
+                - Path=/users/*/requests/**, /users/*/events/*/requests/**
+
+            - id: event-service-route
+              uri: lb://event-service
+              predicates:
+                - Path=/**

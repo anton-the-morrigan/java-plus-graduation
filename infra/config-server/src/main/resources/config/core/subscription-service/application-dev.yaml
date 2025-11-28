@@ -1,0 +1,31 @@
+server.port: ${SERVER_PORT:0}
+
+spring:
+  output.ansi.enabled: ALWAYS
+  sql.init.mode: always
+
+  datasource:
+    url: jdbc:h2:mem:subscription-db
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+
+  jpa:
+    show-sql: true
+    properties:
+      hibernate.format_sql: true
+
+  jackson:
+    serialization.write-dates-as-timestamps: false
+
+logging:
+  file:
+    name: logs/${spring.application.name}.log
+  level:
+    ru.practicum.interaction.logging: DEBUG
+    org.zalando.logbook: TRACE
+    org.springframework.orm.jpa: INFO
+    org.springframework.orm.jpa.JpaTransactionManager: DEBUG
+    org.springframework.transaction: INFO
+    org.springframework.transaction.interceptor: TRACE
+    org.springframework.jdbc.datasource.init: DEBUG

@@ -1,0 +1,54 @@
+server.port: ${SERVER_PORT:0}
+
+spring:
+  output.ansi.enabled: ALWAYS
+  sql.init.mode: always
+
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/ewm_event
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:password}
+
+  jpa:
+    show-sql: true
+    properties.hibernate.format_sql: true
+    hibernate:
+      ddl-auto: none
+
+  jackson:
+    serialization.write-dates-as-timestamps: false
+
+  cloud:
+    openfeign:
+      circuitbreaker.enabled: true
+
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 5
+        failure-rate-threshold: 75
+        minimum-number-of-calls: 5
+        wait-duration-in-open-state: 10s
+        max-wait-duration-in-half-open-state: 5s
+        automatic-transition-from-open-to-half-open-enabled: true
+        permitted-number-of-calls-in-half-open-state: 2
+        ignoreExceptions:
+          - feign.FeignException.FeignClientException
+
+
+
+logging:
+  file:
+    name: logs/${spring.application.name}.log
+  level:
+    ru.practicum.interaction.logging: DEBUG
+    org.zalando.logbook: TRACE
+    org.springframework.orm.jpa: INFO
+    org.springframework.orm.jpa.JpaTransactionManager: DEBUG
+    org.springframework.transaction: INFO
+    org.springframework.transaction.interceptor: TRACE
+    org.springframework.jdbc.datasource.init: DEBUG

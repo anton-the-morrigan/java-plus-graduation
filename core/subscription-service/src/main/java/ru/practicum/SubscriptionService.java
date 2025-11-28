@@ -1,0 +1,17 @@
+package ru.practicum;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.annotation.Import;
+import ru.practicum.config.ExceptionHandlingConfig;
+import ru.practicum.config.JacksonConfig;
+
+@EnableFeignClients("ru.practicum.client")
+@SpringBootApplication
+@Import({JacksonConfig.class, ExceptionHandlingConfig.class})
+public class SubscriptionService {
+    public static void main(String[] args) {
+        SpringApplication.run(SubscriptionService.class, args);
+    }
+}
