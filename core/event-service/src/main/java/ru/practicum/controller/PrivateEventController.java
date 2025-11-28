@@ -26,7 +26,7 @@ import java.util.List;
 public class PrivateEventController {
 
     private final EventService eventService;
-    private final String id = "/{eventId}";
+    private final String ID = "/{eventId}";
 
 
     @GetMapping
@@ -51,14 +51,14 @@ public class PrivateEventController {
         return eventService.saveEvent(dto, userId);
     }
 
-    @GetMapping(id)
+    @GetMapping(ID)
     public EventFullDto getEventByUserIdAndEventId(@PathVariable @Positive Long userId,
                                                    @PathVariable @Positive Long eventId) {
 
         return eventService.getEventByIdAndUserId(eventId, userId);
     }
 
-    @PatchMapping(id)
+    @PatchMapping(ID)
     public EventFullDto updateEventByUser(@PathVariable @Positive Long userId,
                                           @PathVariable @Positive Long eventId,
                                           @RequestBody @Valid UpdateEventUserRequest event) {
