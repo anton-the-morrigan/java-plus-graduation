@@ -5,33 +5,36 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.StatsClient;
+import ru.practicum.AnalyzerClient;
 import ru.practicum.client.RequestClient;
 import ru.practicum.dto.NewEventDto;
 import ru.practicum.dto.event.*;
+import ru.practicum.dto.request.EventRequestStatusUpdateRequest;
+import ru.practicum.dto.request.EventRequestStatusUpdateResult;
+import ru.practicum.dto.request.ParticipationRequestDto;
+import ru.practicum.dto.request.RequestStatus;
 import ru.practicum.entity.*;
 import ru.practicum.ewm.stats.proto.ActionTypeProto;
 import ru.practicum.ewm.stats.proto.RecommendedEventProto;
+import ru.practicum.exception.BadRequestException;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.mapper.EventMapper;
 import ru.practicum.params.EventAdminSearchParam;
 import ru.practicum.params.EventUserSearchParam;
 import ru.practicum.params.PublicEventSearchParam;
+import ru.practicum.params.SortSearchParam;
 import ru.practicum.repository.CategoryRepository;
 import ru.practicum.repository.EventRepository;
 import ru.practicum.service.EventService;
 import ru.practicum.specifications.EventSpecifications;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toList;
 import static ru.practicum.specifications.EventSpecifications.eventAdminSearchParamSpec;
 import static ru.practicum.specifications.EventSpecifications.eventPublicSearchParamSpec;
 
@@ -45,7 +48,7 @@ public class EventServiceImpl implements EventService {
     private final RequestClient requestClient;
     private final CategoryRepository categoryRepository;
     private final EventMapper eventMapper;
-    private final StatsClient statsClient;
+    private final AnalyzerClient analyzerClient;
 
     @Override
     public List<EventFullDto> getEventsByParams(EventAdminSearchParam params) {
@@ -58,15 +61,13 @@ public class EventServiceImpl implements EventService {
                 .map(Event::getId)
                 .toList();
 
+        Map<Long, Double> ratings = analyzerClient.getInteractionsCount(eventIds);
         Map<Long, Long> confirmed = requestClient.getConfirmedRequestsCount(eventIds);
-        return searched.stream()
-                .limit(params.getSize())
-                .map(event -> {
-                    EventFullDto dto = eventMapper.toFullDto(event);
-                    dto.setConfirmedRequests(confirmed.get(dto.getId()) == null ? 0 : confirmed.get(dto.getId()));
-                    return dto;
-                })
-                .collect(toList());
+        return searched.get()
+                .map(event -> eventMapper.toFullDto(event,
+                        ratings.getOrDefault(event.getId(), 0d),
+                        confirmed.getOrDefault(event.getId(), 0L)))
+                .toList();
     }
 
     @Override
@@ -94,11 +95,12 @@ public class EventServiceImpl implements EventService {
 
         EventFullDto dto = eventMapper.toFullDto(updated);
 
+        Map<Long, Double> ratings = analyzerClient.getInteractionsCount(List.of(eventId));
         Map<Long, Long> confirmedRequests = requestClient.getConfirmedRequestsCount(List.of(eventId));
 
-        dto.setConfirmedRequests(confirmedRequests.get(eventId));
-
-        return dto;
+        return eventMapper.toFullDto(event,
+                ratings.getOrDefault(eventId, 0d),
+                confirmedRequests.getOrDefault(eventId, 0L));
     }
 
     @Override
@@ -108,19 +110,11 @@ public class EventServiceImpl implements EventService {
         Event event = eventRepository.findByIdAndState(id, EventState.PUBLISHED)
                 .orElseThrow(() -> new NotFoundException("Событие не найдено или не опубликовано"));
         Map<Long, Long> confirmed = requestClient.getConfirmedRequestsCount(List.of(event.getId()));
+        Map<Long, Double> ratings = analyzerClient.getInteractionsCount(List.of(id));
 
-        EventFullDto dto = eventMapper.toFullDto(event);
-        dto.setConfirmedRequests(confirmed.get(dto.getId()));
-
-        Map<Long, Double> eventRating = getEventRating(List.of(event));
-        double rating = eventRating.getOrDefault(event.getId(), 0.0);
-        dto.setRating(rating);
-
-        if (userId != null) {
-            statsClient.sendUserAction(userId, id, ActionTypeProto.ACTION_VIEW);
-        }
-
-        return dto;
+        return eventMapper.toFullDto(event,
+                ratings.getOrDefault(id, 0d),
+                confirmed.getOrDefault(id, 0L));
     }
 
     @Override
@@ -129,10 +123,11 @@ public class EventServiceImpl implements EventService {
 
         Event event = eventRepository.findById(id).get();
         Map<Long, Long> confirmed = requestClient.getConfirmedRequestsCount(List.of(event.getId()));
+        Map<Long, Double> ratings = analyzerClient.getInteractionsCount(List.of(id));
 
-        EventFullDto dto = eventMapper.toFullDto(event);
-        dto.setConfirmedRequests(confirmed.get(dto.getId()));
-        return dto;
+        return eventMapper.toFullDto(event,
+                ratings.getOrDefault(id, 0d),
+                confirmed.getOrDefault(id, 0L));
     }
 
     @Override
@@ -144,6 +139,8 @@ public class EventServiceImpl implements EventService {
         List<Long> eventIds = events.stream()
                 .map(Event::getId)
                 .toList();
+
+        Map<Long, Double> ratings = analyzerClient.getInteractionsCount(eventIds);
         Map<Long, Long> confirmed = requestClient.getConfirmedRequestsCount(eventIds);
 
         Stream<EventShortDto> eventShortDtoStream = events.stream()
@@ -151,13 +148,16 @@ public class EventServiceImpl implements EventService {
                     if (param.getOnlyAvailable() && confirmed.get(event.getId()) >= event.getParticipantLimit()) {
                         return null;
                     }
-                    EventShortDto dto = eventMapper.toShortDto(event);
-                    dto.setConfirmedRequests(confirmed.get(dto.getId()) == null ? 0 : confirmed.get(dto.getId()));
-                    return dto;
+                    return eventMapper.toShortDto(event,
+                            ratings.getOrDefault(event.getId(), 0d),
+                            confirmed.getOrDefault(event.getId(), 0L));
                 })
                 .filter(Objects::nonNull);
-        return eventShortDtoStream
-                .toList();
+
+        if (param.getSort() == SortSearchParam.RATING) {
+            eventShortDtoStream = eventShortDtoStream.sorted(Comparator.comparingDouble(EventShortDto::getRating));
+        }
+        return eventShortDtoStream.toList();
     }
 
     @Override
@@ -256,28 +256,21 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventShortDto> getRecommendations(Long userId) {
-        Map<Long, Double> eventRating  = statsClient.getRecommendationsForUser(userId, 10)
-                .collect(
-                        Collectors.toMap(RecommendedEventProto::getEventId, RecommendedEventProto::getScore)
-                );
 
-        List<Event> events =  eventRepository.findByIdIn(eventRating.keySet()).stream()
-                .map(event -> {
-                    double rating = eventRating.getOrDefault(event.getId(), 0.0);
-                    event.setRating(rating);
-                    return event;
-                })
-                .toList();
-
-        return events.stream()
-                .map(eventMapper::toShortDto)
-                .toList();
+        return null;
     }
 
     @Override
     public void likeEvent(Long eventId, Long userId) {
-        if (userId != null && eventId != null) {
-            statsClient.sendUserAction(eventId, userId, ActionTypeProto.ACTION_LIKE);
+        Optional<ParticipationRequestDto> request = requestClient.getRequestForEvent(eventId).stream()
+                .filter(r -> r.getRequester().equals(userId))
+                .findFirst();
+
+        boolean requestIsConfirmed = request.isPresent() && RequestStatus.CONFIRMED == request.get().getStatus();
+
+        if (!requestIsConfirmed) {
+            throw new BadRequestException(
+                    String.format("Event %s cannot be liked by user %s. The user is not a participant in the event.", eventId, userId));
         }
     }
 
@@ -315,20 +308,5 @@ public class EventServiceImpl implements EventService {
         if (event.getParticipantLimit() != null) eventToUpdate.setParticipantLimit(event.getParticipantLimit());
         if (event.getRequestModeration() != null) eventToUpdate.setRequestModeration(event.getRequestModeration());
         if (event.getTitle() != null) eventToUpdate.setTitle(event.getTitle());
-    }
-
-    private Map<Long, Double> getEventRating(List<Event> events) {
-        log.debug("Ищем id для событий для поиска рейтинга");
-        List<Long> eventIds = events.stream()
-                .map(Event::getId)
-                .toList();
-        log.debug("Нашли id для событий, ищем рейтинг");
-        Map<Long, Double> res = statsClient.getInteractionsCount(eventIds)
-                .collect(Collectors.toMap(
-                        RecommendedEventProto::getEventId,
-                        RecommendedEventProto::getScore
-                ));
-        log.debug("Нашли рейтинг");
-        return res;
     }
 }

@@ -2,10 +2,8 @@ package ru.practicum.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.StatsClient;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventShortDto;
 import ru.practicum.exception.BadRequestException;
@@ -23,7 +21,6 @@ import java.util.List;
 public class PublicEventController {
 
     private final EventService eventService;
-    private final StatsClient statsClient;
     private final String dateTimePattern = "yyyy-MM-dd HH:mm:ss";
 
     @GetMapping

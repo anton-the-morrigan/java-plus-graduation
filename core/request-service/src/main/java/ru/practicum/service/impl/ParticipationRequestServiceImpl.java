@@ -4,11 +4,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.StatsClient;
 import ru.practicum.client.EventClient;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventState;
-import ru.practicum.ewm.stats.proto.ActionTypeProto;
 import ru.practicum.repository.ParticipationRequestRepository;
 import ru.practicum.dto.request.RequestStatus;
 import ru.practicum.dto.request.EventRequestStatusUpdateRequest;
@@ -33,7 +31,6 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
     private final ParticipationRequestRepository requestRepository;
     private final ParticipationRequestMapper participationRequestMapper;
     private final EventClient eventClient;
-    private final StatsClient statsClient;
 
     @Override
     public List<ParticipationRequestDto> getRequestForEventByUserId(Long eventId, Long userId) {
@@ -113,8 +110,6 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
             request.setStatus(event.getRequestModeration() ? RequestStatus.PENDING : RequestStatus.CONFIRMED);
         }
 
-        statsClient.sendUserAction(userId, eventId, ActionTypeProto.ACTION_REGISTER);
-
         ParticipationRequestDto dto = participationRequestMapper.toDto(requestRepository.save(request));
         log.info("Participation request created {}", dto);
         return dto;
@@ -167,6 +162,13 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
                 confirmed++;
             }
         }
+    }
+
+    @Override
+    public List<ParticipationRequestDto> getRequestForEvent(Long eventId) {
+        log.debug("Get participation requests for event id = {}", eventId);
+        List<ParticipationRequest> requests = requestRepository.findAllByEventId(eventId);
+        return participationRequestMapper.toDto(requests);
     }
 
 }

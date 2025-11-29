@@ -20,6 +20,9 @@ public interface EventMapper {
     @Mapping(target = "initiator", source = "event.initiator")
     EventShortDto toShortDto(Event event);
 
+    @Mapping(target = "category", source = "event.category")
+    EventShortDto toShortDto(Event event, Double rating, Long confirmedRequests);
+
     List<EventShortDto> toShortDto(Collection<Event> events);
 
     @Mapping(target = "rating", ignore = true)
@@ -28,6 +31,10 @@ public interface EventMapper {
     @Mapping(target = "initiator", source = "event.initiator")
     @Mapping(target = "location", source = "event.location")
     EventFullDto toFullDto(Event event);
+
+    @Mapping(target = "category", source = "event.category")
+    @Mapping(target = "location", source = "event.location")
+    EventFullDto toFullDto(Event event, Double rating, Long confirmedRequests);
 
     @Mapping(target = "location", source = "dto.location")
     @Mapping(target = "initiator", ignore = true)

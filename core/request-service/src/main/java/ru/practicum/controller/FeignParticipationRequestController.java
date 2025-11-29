@@ -24,4 +24,9 @@ public class FeignParticipationRequestController implements RequestClient  {
         return participationRequestService.getConfirmedRequestsCount(eventIds);
     }
 
+    @GetMapping("/event/{eventId}")
+    public List<ParticipationRequestDto> getRequestForEvent(@PathVariable Long eventId) {
+        return participationRequestService.getRequestForEvent(eventId);
+    }
+
 }

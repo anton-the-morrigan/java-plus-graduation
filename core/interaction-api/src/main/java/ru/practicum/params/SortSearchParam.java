@@ -1,5 +1,5 @@
 package ru.practicum.params;
 
 public enum SortSearchParam {
-    EVENT_DATE, VIEWS
+    EVENT_DATE, RATING
 }
