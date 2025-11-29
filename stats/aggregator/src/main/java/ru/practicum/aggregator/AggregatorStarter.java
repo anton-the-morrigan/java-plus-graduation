@@ -68,7 +68,7 @@ public class AggregatorStarter implements Runnable {
         } catch (WakeupException ignored) {
             // игнорируем - закрываем консьюмер и продюсер в блоке finally
         } catch (Exception e) {
-            log.error("Ошибка во время обработки событий от датчиков", e);
+            log.error("Ошибка", e);
         } finally {
             try {
                 producer.flush();

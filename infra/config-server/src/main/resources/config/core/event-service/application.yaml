@@ -24,6 +24,18 @@ spring:
     openfeign:
       circuitbreaker.enabled: true
 
+grpc:
+  client:
+    analyzer:
+      address: 'discovery:///analyzer'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+    collector:
+      address: 'discovery:///collector'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
 
 resilience4j:
   circuitbreaker:
@@ -39,8 +51,6 @@ resilience4j:
         permitted-number-of-calls-in-half-open-state: 2
         ignoreExceptions:
           - feign.FeignException.FeignClientException
-
-
 
 logging:
   file:

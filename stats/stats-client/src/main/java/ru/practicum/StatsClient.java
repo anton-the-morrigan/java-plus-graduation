@@ -1,78 +1,77 @@
 package ru.practicum;
 
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.http.ResponseEntity;
+import com.google.protobuf.Timestamp;
+import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
-import ru.practicum.dto.EndpointHitDto;
-import ru.practicum.dto.ViewStatsDto;
+import ru.practicum.ewm.stats.proto.*;
+import ru.practicum.grpc.stats.collector.UserActionControllerGrpc;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import java.time.Instant;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
-@Slf4j
 @Component
-@RequiredArgsConstructor
 public class StatsClient {
-    private static final String STATS_SERVER_ID = "stats-server";
-    private final RestTemplate restTemplate;
-    private final DiscoveryClient discoveryClient;
 
-    @CircuitBreaker(name = "statsClient", fallbackMethod = "postHitFallback")
-    public void postHit(EndpointHitDto dto) {
-        ServiceInstance statsServer = getStatsServerInstance();
-        restTemplate.postForEntity(statsServer.getUri() + "/hit", dto, Void.class);
+    @GrpcClient("collector")
+    private UserActionControllerGrpc.UserActionControllerBlockingStub collector;
+
+    @GrpcClient("analyzer")
+    private RecommendationsControllerGrpc.RecommendationsControllerBlockingStub analyzer;
+
+    public Stream<RecommendedEventProto> getSimilarEvents (long eventId, long userId, int maxResults) {
+        SimilarEventsRequestProto request = SimilarEventsRequestProto.newBuilder()
+                .setUserId(userId)
+                .setEventId(eventId)
+                .setMaxResults(maxResults)
+                .build();
+
+        Iterator<RecommendedEventProto> iterator = analyzer.getSimilarEvents(request);
+        return asStream(iterator);
     }
 
-    @CircuitBreaker(name = "statsClient", fallbackMethod = "getStatsFallback")
-    public List<ViewStatsDto> getStats(String start, String end, List<String> uris, boolean unique) throws RestClientException {
-        ServiceInstance statsServer = getStatsServerInstance();
+    public Stream<RecommendedEventProto> getInteractionsCount (List<Long> eventId) {
+        InteractionsCountRequestProto request = InteractionsCountRequestProto.newBuilder()
+                .addAllEventId(eventId)
+                .build();
+        Iterator<RecommendedEventProto> iterator = analyzer.getInteractionsCount(request);
 
-        StringBuilder uri = new StringBuilder()
-                .append(statsServer.getUri())
-                .append("/stats")
-                .append("?start=").append(start)
-                .append("&end=").append(end)
-                .append("&unique=").append(unique);
-
-        if (!uris.isEmpty()) {
-            for (String uriStr : uris) {
-                uri.append("&uri=").append(uriStr);
-            }
-        }
-
-        ResponseEntity<ViewStatsDto[]> response = restTemplate.getForEntity(uri.toString(), ViewStatsDto[].class);
-
-        ViewStatsDto[] body = response.getBody();
-        return (body == null) ? new ArrayList<>() : Arrays.asList(body);
+        return asStream(iterator);
     }
 
-    private void postHitFallback(EndpointHitDto dto, Exception ex) {
-        log.warn("Stats server unavailable, hit not recorded: {}", ex.getMessage());
+    public Stream<RecommendedEventProto> getRecommendationsForUser(long userId, int maxResults) {
+        UserPredictionsRequestProto request = UserPredictionsRequestProto.newBuilder()
+                .setUserId(userId)
+                .setMaxResults(maxResults)
+                .build();
+        Iterator<RecommendedEventProto> iterator = analyzer.getRecommendationsForUser(request);
+
+        return asStream(iterator);
     }
 
-    private List<ViewStatsDto> getStatsFallback(String start, String end, List<String> uris, boolean unique, Exception ex) {
-        log.warn("Stats server unavailable, returned empty list: {}", ex.getMessage());
-        return Collections.emptyList();
+    public void sendUserAction (long userId, long eventId, ActionTypeProto actionType) {
+        UserActionProto request = UserActionProto.newBuilder()
+                .setEventId(eventId)
+                .setUserId(userId)
+                .setTimestamp(getCurrentTimestamp())
+                .setActionType(actionType)
+                .build();
+        collector.collectUserAction(request);
     }
 
-    private ServiceInstance getStatsServerInstance() {
-        try {
-            return discoveryClient
-                    .getInstances(STATS_SERVER_ID)
-                    .getFirst();
-        } catch (Exception exception) {
-            throw new RuntimeException(
-                    "Ошибка обнаружения адреса сервиса статистики с id: " + STATS_SERVER_ID,
-                    exception
-            );
-        }
+    private Stream<RecommendedEventProto> asStream(Iterator<RecommendedEventProto> iterator) {
+        return StreamSupport.stream(
+                Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED), false);
+    }
+
+    private Timestamp getCurrentTimestamp() {
+        return Timestamp.newBuilder()
+                .setSeconds(Instant.now().getEpochSecond())
+                .setNanos(Instant.now().getNano())
+                .build();
     }
 }
