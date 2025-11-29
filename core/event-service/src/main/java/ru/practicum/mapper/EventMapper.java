@@ -6,6 +6,7 @@ import org.mapstruct.MappingConstants;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventShortDto;
 import ru.practicum.dto.NewEventDto;
+import ru.practicum.entity.Category;
 import ru.practicum.entity.Event;
 
 import java.util.Collection;
@@ -37,8 +38,11 @@ public interface EventMapper {
     EventFullDto toFullDto(Event event, Double rating, Long confirmedRequests);
 
     @Mapping(target = "location", source = "dto.location")
-    @Mapping(target = "initiator", ignore = true)
-    @Mapping(target = "category", ignore = true)
-    @Mapping(target = "state", expression = "java(ru.practicum.dto.event.EventState.PENDING)")
-    Event toEntity(NewEventDto dto, Long userId);
+    @Mapping(target = "initiator", source = "userId")
+    @Mapping(target = "category", source = "category")
+    @Mapping(target = "createdOn", ignore = true)
+    @Mapping(target = "publishedOn", ignore = true)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "state", expression = "java(ru.practicum.interaction.dto.event.EventState.PENDING)")
+    Event toEntity(NewEventDto dto, Long userId, Category category);
 }

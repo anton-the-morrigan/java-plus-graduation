@@ -181,24 +181,13 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventFullDto saveEvent(NewEventDto dto, Long userId) {
-        log.info("Save event: {}", dto);
+        Long categoryId = dto.getCategory();
+        Category category = categoryRepository.findById(categoryId).get();
 
-        Event event = eventMapper.toEntity(dto, userId);
+        Event event = eventMapper.toEntity(dto, userId, category);
+        eventRepository.saveAndFlush(event);
 
-        Long categoryId = dto.getCategory().longValue();
-
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new NotFoundException("Категория с id=" + categoryId + " не найдена"));
-
-        event.setInitiator(userId);
-        event.setCategory(category);
-
-        Event saved = eventRepository.saveAndFlush(event);
-
-        EventFullDto dtoResponse = eventMapper.toFullDto(saved);
-        dtoResponse.setConfirmedRequests(0L);
-
-        return dtoResponse;
+        return eventMapper.toFullDto(event);
     }
 
     @Override
