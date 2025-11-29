@@ -1,4 +1,4 @@
-package ru.practicum.stats.analyzer.service.similarity;
+package ru.practicum.stats.analyzer.processor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -8,6 +8,7 @@ import org.apache.kafka.common.errors.WakeupException;
 import org.springframework.stereotype.Service;
 import ru.practicum.stats.analyzer.config.SimilarityProcKafkaConfig;
 import ru.practicum.ewm.stats.avro.EventsSimilarityAvro;
+import ru.practicum.stats.analyzer.service.similarity.SimilarityService;
 
 import java.time.Duration;
 import java.util.List;

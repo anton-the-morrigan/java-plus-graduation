@@ -1,4 +1,4 @@
-package ru.practicum.stats.analyzer.service.interaction;
+package ru.practicum.stats.analyzer.processor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -8,6 +8,7 @@ import org.apache.kafka.common.errors.WakeupException;
 import org.springframework.stereotype.Service;
 import ru.practicum.stats.analyzer.config.InteractionProcKafkaConfig;
 import ru.practicum.ewm.stats.avro.UserActionAvro;
+import ru.practicum.stats.analyzer.service.interaction.InteractionService;
 
 import java.time.Duration;
 import java.util.List;
