@@ -9,10 +9,6 @@ import ru.practicum.StatsClient;
 import ru.practicum.client.RequestClient;
 import ru.practicum.dto.NewEventDto;
 import ru.practicum.dto.event.*;
-import ru.practicum.dto.request.EventRequestStatusUpdateRequest;
-import ru.practicum.dto.request.EventRequestStatusUpdateResult;
-import ru.practicum.dto.request.ParticipationRequestDto;
-import ru.practicum.dto.user.UserShortDto;
 import ru.practicum.entity.*;
 import ru.practicum.ewm.stats.proto.ActionTypeProto;
 import ru.practicum.ewm.stats.proto.RecommendedEventProto;
@@ -22,14 +18,12 @@ import ru.practicum.mapper.EventMapper;
 import ru.practicum.params.EventAdminSearchParam;
 import ru.practicum.params.EventUserSearchParam;
 import ru.practicum.params.PublicEventSearchParam;
-import ru.practicum.params.SortSearchParam;
 import ru.practicum.repository.CategoryRepository;
 import ru.practicum.repository.EventRepository;
 import ru.practicum.service.EventService;
 import ru.practicum.specifications.EventSpecifications;
 
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -38,7 +32,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 import static ru.practicum.specifications.EventSpecifications.eventAdminSearchParamSpec;
 import static ru.practicum.specifications.EventSpecifications.eventPublicSearchParamSpec;
 
