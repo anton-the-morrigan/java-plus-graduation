@@ -12,19 +12,19 @@ public interface EventSimilarityRepository extends JpaRepository<EventSimilarity
     @Query("""
         SELECT e
         FROM EventSimilarity e
-        WHERE (e.event_a = :event_id OR e.event_b = :event_id)
-        AND (e.event_a NOT IN :excluded_ids AND e.event_b NOT IN :excluded_ids)""")
-    List<EventSimilarity> findAllByEventIdAndEventIds(@Param("event_id") Long eventId,
-                                                      @Param("excluded_ids") List<Long> excludedIds);
+        WHERE (e.eventA = :eventId OR e.eventB = :eventId)
+        AND (e.eventA NOT IN :excludedIds AND e.eventB NOT IN :excludedIds)""")
+    List<EventSimilarity> findAllByEventIdAndEventIds(@Param("eventId") Long eventId,
+                                                      @Param("excludedIds") List<Long> excludedIds);
 
     @Query("""
     SELECT e
     FROM EventSimilarity e
-    WHERE (e.event_a IN :eventIds OR e.event_b IN :event_ids)
-      AND e.event_a NOT IN :excluded_ids
-      AND e.event_b NOT IN :excluded_ids""")
-    List<EventSimilarity> findAllByEventIdsAndExcludedIds(@Param("event_ids") List<Long> eventIds,
-                                                          @Param("excluded_ids") List<Long> excludedIds);
+    WHERE (e.eventA IN :eventIds OR e.eventB IN :eventIds)
+      AND e.eventA NOT IN :excludedIds
+      AND e.eventB NOT IN :excludedIds""")
+    List<EventSimilarity> findAllByEventIdsAndExcludedIds(@Param("eventIds") List<Long> eventIds,
+                                                          @Param("excludedIds") List<Long> excludedIds);
 
     List<EventSimilarity> findAllByEventA(Long eventAId);
 }

@@ -20,13 +20,10 @@ public class UserAction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @Column(name = "user_id")
     Long userId;
 
-    @Column(name = "event_id")
     Long eventId;
 
-    @Column(name = "action_type")
     @Enumerated(EnumType.STRING)
     ActionTypeAvro actionType;
 

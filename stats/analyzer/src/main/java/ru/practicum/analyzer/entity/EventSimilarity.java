@@ -19,10 +19,8 @@ public class EventSimilarity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @Column(name = "event_a")
     Long eventA;
 
-    @Column(name = "event_b")
     Long eventB;
 
     Double score;
