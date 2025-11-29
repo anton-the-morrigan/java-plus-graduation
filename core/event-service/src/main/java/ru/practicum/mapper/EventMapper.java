@@ -43,6 +43,6 @@ public interface EventMapper {
     @Mapping(target = "createdOn", ignore = true)
     @Mapping(target = "publishedOn", ignore = true)
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "state", expression = "java(ru.practicum.interaction.dto.event.EventState.PENDING)")
+    @Mapping(target = "state", expression = "java(ru.practicum.dto.event.EventState.PENDING)")
     Event toEntity(NewEventDto dto, Long userId, Category category);
 }
