@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.StatsClient;
 import ru.practicum.client.EventClient;
 import ru.practicum.client.RequestClient;
 import ru.practicum.client.UserClient;
@@ -29,7 +28,6 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final UserClient userClient;
     private final EventClient eventClient;
     private final RequestClient requestClient;
-    private final StatsClient statsClient;
 
     private final String startDate = "2000-01-01 00:00:00";
     private final String endDate = "2100-01-01 00:00:00";
