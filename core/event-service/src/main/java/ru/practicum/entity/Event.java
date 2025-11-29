@@ -65,8 +65,6 @@ public class Event {
 
     @Embedded
     Location location;
-
-    Double rating;
 }
 
 
