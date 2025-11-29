@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS interactions (
     user_id BIGINT NOT NULL,
     event_id BIGINT NOT NULL,
     action_type VARCHAR NOT NULL,
-    timestamp TIMESTAMP WITHOUT TIME ZONE NOT NULL
+    timestamp TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     UNIQUE(user_id, event_id)
 );
 
