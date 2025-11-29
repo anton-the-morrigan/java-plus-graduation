@@ -256,8 +256,21 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventShortDto> getRecommendations(Long userId) {
+        Map<Long, Double> recommended = analyzerClient.getRecommendationsForUser(userId, 100);
+        if (recommended.isEmpty()) {
+            return List.of();
+        }
+        List<Long> eventIds = new ArrayList<>(recommended.keySet());
 
-        return null;
+        List<Event> events = eventRepository.findAllById(eventIds);
+        Map<Long, Double> ratings = analyzerClient.getInteractionsCount(eventIds);
+        Map<Long, Long> confirmedRequests = requestClient.getConfirmedRequestsCount(eventIds);
+
+        return events.stream()
+                .map(event -> eventMapper.toShortDto(event,
+                        ratings.getOrDefault(event.getId(), 0d),
+                        confirmedRequests.getOrDefault(event.getId(), 0L)))
+                .toList();
     }
 
     @Override
