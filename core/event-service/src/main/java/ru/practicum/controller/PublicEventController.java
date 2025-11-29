@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.CollectorClient;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventShortDto;
 import ru.practicum.exception.BadRequestException;
@@ -21,6 +22,7 @@ import java.util.List;
 public class PublicEventController {
 
     private final EventService eventService;
+    private final CollectorClient collectorClient;
     private final String dateTimePattern = "yyyy-MM-dd HH:mm:ss";
 
     @GetMapping
@@ -67,10 +69,9 @@ public class PublicEventController {
                                      @RequestHeader(value = "X-EWM-USER-ID", required = false) Long userId,
                                      HttpServletRequest request) {
 
-        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern(dateTimePattern));
+        collectorClient.saveView(userId, id);
 
-        EventFullDto event = eventService.getEventById(id, userId);
-        return event;
+        return eventService.getEventById(id, userId);
     }
 
     @GetMapping("/recommendations")
@@ -81,6 +82,7 @@ public class PublicEventController {
     @PutMapping("/events/{eventId}/like")
     public void likeEvent(@PathVariable Long eventId,
                           @RequestHeader(value = "X-EWM-USER-ID", required = false) Long userId) {
+        collectorClient.saveLike(userId, eventId);
         eventService.likeEvent(eventId, userId);
     }
 }
