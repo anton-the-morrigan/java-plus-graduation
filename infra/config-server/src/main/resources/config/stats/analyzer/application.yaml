@@ -3,53 +3,54 @@ server:
 
 grpc:
   server:
-    port: 0
+    port: ${GRPC_SERVER_PORT:0}
 
 spring:
   output.ansi.enabled: ALWAYS
   sql.init.mode: always
 
-  kafka:
-    bootstrap-servers: localhost:9092
-    consumer:
-      user-action:
-        group-id: analyzer-consumer-user-action-group
-      event-similarity:
-        group-id: analyzer-consumer-event-similarity-group
-kafka:
-  topics:
-    event-similarity: stats.events-similarity.v1
-    user-action: stats.user-actions.v1
-
-
   datasource:
     driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/ewm_stats_db
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/ewm_rating
     username: ${POSTGRES_USER:postgres}
     password: ${POSTGRES_PASSWORD:password}
 
   jpa:
     show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
+    properties.hibernate.format_sql: true
     hibernate:
       ddl-auto: none
 
-  jackson:
-    serialization.write-dates-as-timestamps: false
+analyzer:
+  interaction:
+    kafka:
+      consumer:
+        properties:
+          enable.auto.commit: true
+          bootstrap.servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+          key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+          value.deserializer: ru.practicum.ewm.stats.serialization.avro.UserActionAvroDeserializer
+          group.id: stats.analyzer.interaction
+          auto.offset.reset: latest
+          max.poll.interval.ms: 300000
+          max.poll.records: 500
+        topic: stats.user-actions.v1
+        pool-timeout: 10000ms
 
-logging:
-  file:
-    name: logs/${spring.application.name}.log
-  level:
-    ru.practicum.interaction.logging: DEBUG
-    org.zalando.logbook: TRACE
-    org.springframework.orm.jpa: INFO
-    org.springframework.orm.jpa.JpaTransactionManager: DEBUG
-    org.springframework.transaction: INFO
-    org.springframework.transaction.interceptor: TRACE
-    org.springframework.jdbc.datasource.init: DEBUG
+  similarity:
+    kafka:
+      consumer:
+        properties:
+          enable.auto.commit: true
+          bootstrap.servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+          key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+          value.deserializer: ru.practicum.ewm.stats.serialization.avro.EventSimilarityAvroDeserializer
+          group.id: stats.analyzer.similarity
+          auto.offset.reset: latest
+          max.poll.interval.ms: 300000
+          max.poll.records: 500
+        topic: stats.events-similarity.v1
+        pool-timeout: 10000ms
 
 
 

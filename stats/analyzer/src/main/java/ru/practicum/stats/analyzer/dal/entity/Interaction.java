@@ -1,31 +1,35 @@
-package ru.practicum.analyzer.entity;
+package ru.practicum.stats.analyzer.dal.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import ru.practicum.ewm.stats.avro.ActionTypeAvro;
 
 import java.time.Instant;
 
+@Entity
+@Table(name = "interactions")
 @Getter
 @Setter
-@Entity
+@ToString
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "interactions")
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserAction {
+public class Interaction {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
+    @Column(name = "user_id", nullable = false)
     Long userId;
 
+    @Column(name = "event_id", nullable = false)
     Long eventId;
 
-    @Enumerated(EnumType.STRING)
-    ActionTypeAvro actionType;
+    @Column(name = "rating", nullable = false)
+    Float rating;
 
+    @Column(name = "ts", nullable = false)
     Instant timestamp;
 }

@@ -3,7 +3,7 @@ server:
 
 grpc:
   server:
-    port: 0
+    port: ${GRPC_SERVER_PORT:0}
 
 spring:
   output.ansi.enabled: ALWAYS
