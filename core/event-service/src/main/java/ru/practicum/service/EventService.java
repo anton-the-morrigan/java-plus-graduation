@@ -22,7 +22,7 @@ public interface EventService {
 
     EventFullDto updateEventByAdmin(Long eventId, UpdateEventAdminRequest updateRequest);
 
-    EventFullDto getEventById(Long id);
+    EventFullDto getEventById(Long id, Long userId);
 
     EventFullDto getEventForRequest(Long id);
 
@@ -39,4 +39,8 @@ public interface EventService {
     List<EventShortDto> getEventsFeedCogList(List<Long> followedUsersIds, PublicEventSearchParam param);
 
     Map<Long, EventFullDto> getEventsFeedCogMap(List<Long> followedUsersIds, PublicEventSearchParam param);
+
+    List<EventShortDto> getRecommendations(Long userId);
+
+    void likeEvent(Long eventId, Long userId);
 }

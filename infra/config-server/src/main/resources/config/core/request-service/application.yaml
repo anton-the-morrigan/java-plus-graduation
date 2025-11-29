@@ -1,4 +1,5 @@
-server.port: ${SERVER_PORT:0}
+server:
+  port: ${SERVER_PORT:0}
 
 spring:
   output.ansi.enabled: ALWAYS
@@ -20,6 +21,19 @@ spring:
 
   jackson:
     serialization.write-dates-as-timestamps: false
+
+grpc:
+  client:
+    analyzer:
+      address: 'discovery:///analyzer'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+    collector:
+      address: 'discovery:///collector'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
 
 logging:
   file:

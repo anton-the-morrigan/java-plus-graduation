@@ -9,7 +9,9 @@ import org.springframework.stereotype.Repository;
 import ru.practicum.entity.Event;
 import ru.practicum.dto.event.EventState;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, Long> {
@@ -21,4 +23,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     @EntityGraph(attributePaths = {"category"})
     Page<Event> findAll(Specification<Event> specification, Pageable pageable);
+
+    List<Event> findByIdIn(Set<Long> eventIds);
 }

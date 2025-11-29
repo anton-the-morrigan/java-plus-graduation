@@ -21,7 +21,7 @@ public class EventFullDto {
     Long initiator;
     Boolean paid;
     String title;
-    Long views;
+    Double rating;
     LocalDateTime createdOn;
     String description;
     LocationDto location;
