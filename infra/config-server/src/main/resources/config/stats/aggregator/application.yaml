@@ -1,0 +1,18 @@
+server:
+  port: ${SERVER_PORT:0}
+
+grpc:
+  server:
+    port: ${GRPC_SERVER_PORT:0}
+
+spring:
+  output.ansi.enabled: ALWAYS
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: aggregator-consumer-group
+
+kafka:
+  topics:
+    user-actions: stats.user-actions.v1
+    events-similarity: stats.events-similarity.v1

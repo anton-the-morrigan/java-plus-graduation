@@ -164,4 +164,11 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         }
     }
 
+    @Override
+    public List<ParticipationRequestDto> getRequestForEvent(Long eventId) {
+        log.debug("Get participation requests for event id = {}", eventId);
+        List<ParticipationRequest> requests = requestRepository.findAllByEventId(eventId);
+        return participationRequestMapper.toDto(requests);
+    }
+
 }

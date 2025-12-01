@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.CollectorClient;
 import ru.practicum.dto.request.EventRequestStatusUpdateRequest;
 import ru.practicum.dto.request.EventRequestStatusUpdateResult;
 import ru.practicum.dto.request.ParticipationRequestDto;
@@ -21,6 +22,7 @@ public class PrivateParticipationRequestController {
     private final String EVENT_REQUEST = "/events/{eventId}/requests";
 
     private final ParticipationRequestService participationRequestService;
+    private final CollectorClient collectorClient;
 
     @GetMapping(REQUEST)
     public List<ParticipationRequestDto> getRequests(@PathVariable Long userId) {
@@ -32,6 +34,7 @@ public class PrivateParticipationRequestController {
     public ParticipationRequestDto createRequest(@PathVariable Long userId,
                                                  @RequestParam Long eventId) {
         log.info("Create request for user {} with event {}", userId, eventId);
+        collectorClient.saveRegister(userId, eventId);
         return participationRequestService.createRequest(userId, eventId);
     }
 
@@ -45,8 +48,7 @@ public class PrivateParticipationRequestController {
     public List<ParticipationRequestDto> getUsersRequests(@PathVariable @Positive Long userId,
                                                           @PathVariable @Positive Long eventId) {
 
-        List<ParticipationRequestDto> requestForEventByUserId = participationRequestService.getRequestForEventByUserId(eventId, userId);
-        return requestForEventByUserId;
+        return participationRequestService.getRequestForEventByUserId(eventId, userId);
     }
 
     @PatchMapping(EVENT_REQUEST)

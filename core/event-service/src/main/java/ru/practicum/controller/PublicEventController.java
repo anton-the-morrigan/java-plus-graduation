@@ -2,11 +2,9 @@ package ru.practicum.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.StatsClient;
-import ru.practicum.dto.EndpointHitDto;
+import ru.practicum.CollectorClient;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventShortDto;
 import ru.practicum.exception.BadRequestException;
@@ -18,15 +16,15 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-@Slf4j
 @RestController
 @RequestMapping("/events")
 @RequiredArgsConstructor
 public class PublicEventController {
 
     private final EventService eventService;
-    private final StatsClient statsClient;
+    private final CollectorClient collectorClient;
     private final String dateTimePattern = "yyyy-MM-dd HH:mm:ss";
+    private final String USER_ID_HEADER = "X-EWM-USER-ID";
 
     @GetMapping
     public List<EventShortDto> getEvents(
@@ -50,13 +48,6 @@ public class PublicEventController {
 
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern(dateTimePattern));
 
-        statsClient.postHit(EndpointHitDto.builder()
-                .app("ewm-main-service")
-                .uri(request.getRequestURI())
-                .ip(request.getRemoteAddr())
-                .timestamp(timestamp)
-                .build());
-
         PublicEventSearchParam param = PublicEventSearchParam.builder()
                 .text(text)
                 .categories(categories)
@@ -75,18 +66,24 @@ public class PublicEventController {
     }
 
     @GetMapping("/{id}")
-    public EventFullDto getEventById(@PathVariable Long id, HttpServletRequest request) {
+    public EventFullDto getEventById(@PathVariable Long id,
+                                     @RequestHeader(value = USER_ID_HEADER, required = false) Long userId,
+                                     HttpServletRequest request) {
 
-        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern(dateTimePattern));
+        collectorClient.saveView(userId, id);
 
-        statsClient.postHit(EndpointHitDto.builder()
-                .app("ewm-main-service")
-                .uri(request.getRequestURI())
-                .ip(request.getRemoteAddr())
-                .timestamp(timestamp)
-                .build());
+        return eventService.getEventById(id, userId);
+    }
 
-        EventFullDto event = eventService.getEventById(id);
-        return event;
+    @GetMapping("/recommendations")
+    public List<EventShortDto> getRecommendations(@RequestHeader(USER_ID_HEADER) Long userId) {
+        return eventService.getRecommendations(userId);
+    }
+
+    @PutMapping("/events/{eventId}/like")
+    public void likeEvent(@PathVariable Long eventId,
+                          @RequestHeader(value = USER_ID_HEADER, required = false) Long userId) {
+        collectorClient.saveLike(userId, eventId);
+        eventService.likeEvent(eventId, userId);
     }
 }
