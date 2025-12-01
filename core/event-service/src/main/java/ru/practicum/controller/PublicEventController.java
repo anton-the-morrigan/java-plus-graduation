@@ -24,6 +24,7 @@ public class PublicEventController {
     private final EventService eventService;
     private final CollectorClient collectorClient;
     private final String dateTimePattern = "yyyy-MM-dd HH:mm:ss";
+    private final String USER_ID_HEADER = "X-EWM-USER-ID";
 
     @GetMapping
     public List<EventShortDto> getEvents(
@@ -66,7 +67,7 @@ public class PublicEventController {
 
     @GetMapping("/{id}")
     public EventFullDto getEventById(@PathVariable Long id,
-                                     @RequestHeader(value = "X-EWM-USER-ID", required = false) Long userId,
+                                     @RequestHeader(value = USER_ID_HEADER, required = false) Long userId,
                                      HttpServletRequest request) {
 
         collectorClient.saveView(userId, id);
@@ -75,13 +76,13 @@ public class PublicEventController {
     }
 
     @GetMapping("/recommendations")
-    public List<EventShortDto> getRecommendations(@RequestHeader("X-EWM-USER-ID") Long userId) {
+    public List<EventShortDto> getRecommendations(@RequestHeader(USER_ID_HEADER) Long userId) {
         return eventService.getRecommendations(userId);
     }
 
     @PutMapping("/events/{eventId}/like")
     public void likeEvent(@PathVariable Long eventId,
-                          @RequestHeader(value = "X-EWM-USER-ID", required = false) Long userId) {
+                          @RequestHeader(value = USER_ID_HEADER, required = false) Long userId) {
         collectorClient.saveLike(userId, eventId);
         eventService.likeEvent(eventId, userId);
     }
